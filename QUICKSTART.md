@@ -22,14 +22,14 @@ pip install -r requirements.txt
 pip install -e .
 
 # 4. Generate your sovereign key
-unified-cli keygen
+unifiedcli keygen
 # Copy the output: export POOKIE_KEY=pk-...
 
 # 5. Set your key
 export POOKIE_KEY=pk-...
 
 # 6. Start the agent
-unified-cli shell
+unifiedcli shell
 ```
 
 ## Using the CLI
@@ -126,14 +126,14 @@ docker-compose build
 docker-compose up -d
 
 # Exec shell
-docker-compose exec unified-platform bash -c "source venv/bin/activate && unified-cli shell"
+docker-compose exec unified-platform bash -c "source venv/bin/activate && unifiedcli shell"
 ```
 
 ## Troubleshooting
 
 **"POOKIE_KEY not set"**
 ```bash
-unified-cli keygen
+unifiedcli keygen
 export POOKIE_KEY=pk-your-key
 ```
 
@@ -164,7 +164,7 @@ export POOKIE_KEY=pk-your-key
 ```
 your machine              VPS (108.181.162.206)
 ┌─────────────┐          ┌──────────────────┐
-│ unified-cli │ ◄──────► │  pookie server   │
+│ unifiedcli │ ◄──────► │  pookie server   │
 │  ├ pookie   │  (REST)  │  + llama.cpp     │
 │  ├ toollama │          │  + registry      │
 │  └ memory   │          │  + models        │

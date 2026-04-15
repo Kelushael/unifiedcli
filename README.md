@@ -25,11 +25,11 @@ pip install -r requirements.txt
 pip install -e .
 
 # Generate sovereign key
-unified-cli keygen
+unifiedcli keygen
 export POOKIE_KEY=pk-...
 
 # Start the agent
-unified-cli shell
+unifiedcli shell
 ```
 
 ## Quick Start
@@ -62,7 +62,7 @@ unified-cli shell
 
 ```
 ┌────────────────────────────────────┐
-│     unified-cli (your agent)       │
+│     unifiedcli (your agent)       │
 ├────────────────────────────────────┤
 │   YahushuaCLI Interactive Shell    │
 ├──────────────┬─────────────────────┤
@@ -99,7 +99,7 @@ Create `.env` file or set environment variables:
 
 ```bash
 # Required
-POOKIE_KEY=pk-...  # From 'unified-cli keygen'
+POOKIE_KEY=pk-...  # From 'unifiedcli keygen'
 
 # Optional (defaults shown)
 POOKIE_REGISTRY=http://108.181.162.206:7070
@@ -118,7 +118,7 @@ BASH_TIMEOUT_SECONDS=30
 ✅ **Persistent Memory:** Memories survive across sessions  
 ✅ **Developer Tools:** File operations, bash execution, git integration  
 ✅ **Local-First:** No cloud dependencies  
-✅ **Single Entry Point:** One `unified-cli` command  
+✅ **Single Entry Point:** One `unifiedcli` command  
 
 ## Requirements
 
@@ -144,7 +144,7 @@ pylint unified/
 
 **"POOKIE_KEY not set"**
 ```bash
-unified-cli keygen
+unifiedcli keygen
 export POOKIE_KEY=pk-...
 ```
 
