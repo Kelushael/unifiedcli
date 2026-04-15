@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⬡ DANAE STUDIO // Live Artifacts</title>
+<style>
+:root {--pink:#ff6eb4;--yellow:#ffe94d;--blue:#7dd8f8;--lime:#aaff00;--black:#080808;--bg:#0d0d0d;--bg2:#111;--bg3:#181818;--dim:#252525;--dim2:#333;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--lime);font-family:'Courier New',monospace;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#topbar{background:var(--black);border-bottom:1px solid var(--dim);padding:0 14px;height:36px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.t-title{color:var(--pink);font-size:10px;letter-spacing:5px;text-transform:uppercase;}
+.pills{display:flex;gap:5px;}
+.pill{font-size:8px;letter-spacing:2px;padding:2px 7px;border-radius:10px;border:1px solid;text-transform:uppercase;}
+.p-live{color:var(--pink);border-color:var(--pink);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#main{flex:1;display:flex;overflow:hidden;}
+#left{width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--dim);background:var(--bg2);overflow:hidden;}
+.sect-hd{font-size:8px;letter-spacing:3px;color:#444;padding:5px 10px;text-transform:uppercase;background:var(--black);border-bottom:1px solid var(--dim);}
+.status{padding:8px 10px;font-size:9px;display:flex;align-items:center;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:#f44;}
+.dot.live{background:var(--lime);animation:pulse 1s infinite;}
+#source-info{padding:8px 10px;font-size:8px;color:#555;border-bottom:1px solid var(--dim);}
+#controls{padding:10px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--dim);}
+.ctrl-btn{background:transparent;border:1px solid var(--dim2);color:#666;font-size:8px;padding:4px 8px;cursor:pointer;text-transform:uppercase;transition:.15s;border-radius:2px;}
+.ctrl-btn:hover{border-color:var(--pink);color:var(--pink);}
+.ctrl-btn.primary{border-color:var(--lime);color:var(--lime);}
+.ctrl-btn.primary:hover{background:var(--lime);color:var(--black);}
+#code-panel{flex:1;overflow-y:auto;padding:8px;font-size:8px;line-height:1.5;color:#444;}
+#code-panel::-webkit-scrollbar{width:2px;}
+#code-panel::-webkit-scrollbar-thumb{background:var(--dim2);}
+#preview{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--dim);}
+#preview-bar{background:var(--black);border-bottom:1px solid var(--dim);padding:0 10px;height:28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#preview-bar span{font-size:8px;letter-spacing:2px;color:#444;text-transform:uppercase;}
+.pbtn{font-size:8px;padding:2px 7px;border:1px solid var(--dim2);color:#555;background:transparent;cursor:pointer;text-transform:uppercase;transition:.15s;}
+.pbtn:hover{border-color:var(--pink);color:var(--pink);}
+#preview-frame{flex:1;border:none;background:white;}
+#placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);}
+.ph-icon{font-size:32px;color:var(--dim2);}
+.ph-text{font-size:10px;letter-spacing:2px;color:#2a2a2a;}
+#sbar{background:var(--black);border-top:1px solid var(--dim);padding:2px 14px;display:flex;justify-content:space-between;font-size:8px;letter-spacing:2px;color:#2a2a2a;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="t-title">⬡ DANAE STUDIO // Live Window</div>
+  <div class="pills">
+    <span class="pill p-live">LISTENING</span>
+  </div>
+</div>
+
+<div id="main">
+<div id="left">
+  <div class="sect-hd">// Artifact Source</div>
+  <div class="status">
+    <span class="dot live"></span>
+    <span>Waiting for HTML from chat...</span>
+  </div>
+  <div id="source-info">Window ID: <strong id="window-id">—</strong></div>
+
+  <div class="sect-hd">// Actions</div>
+  <div id="controls">
+    <button class="ctrl-btn primary" id="copy-btn">COPY CODE</button>
+    <button class="ctrl-btn" id="download-btn">DOWNLOAD</button>
+    <button class="ctrl-btn" id="refresh-btn">REFRESH</button>
+  </div>
+
+  <div class="sect-hd">// Generated Code</div>
+  <div id="code-panel"></div>
+</div>
+
+<div id="preview">
+  <div id="preview-bar">
+    <span>// LIVE PREVIEW</span>
+  </div>
+  <div id="placeholder">
+    <div class="ph-icon">⬡</div>
+    <div class="ph-text">Waiting for artifact...</div>
+  </div>
+  <iframe id="preview-frame" style="display:none;"></iframe>
+</div>
+</div>
+
+<div id="sbar">
+  <span>DANAE Chat → Studio Bridge (postMessage)</span>
+  <span id="msg-count">Messages: 0</span>
+</div>
+
+<script>
+(function(){"use strict";
+
+const codePanel = document.getElementById('code-panel');
+const previewFrame = document.getElementById('preview-frame');
+const placeholder = document.getElementById('placeholder');
+const windowId = document.getElementById('window-id');
+const msgCount = document.getElementById('msg-count');
+const copyBtn = document.getElementById('copy-btn');
+const downloadBtn = document.getElementById('download-btn');
+const refreshBtn = document.getElementById('refresh-btn');
+
+let currentHTML = '';
+let messageCounter = 0;
+
+windowId.textContent = Math.random().toString(36).slice(2, 11);
+
+// Listen for messages from DANAE chat
+window.addEventListener('message', (event) => {
+  // Only accept from same origin for security
+  if (event.origin !== window.location.origin) {
+    console.warn('Rejected message from untrusted origin:', event.origin);
+    return;
+  }
+
+  const data = event.data;
+
+  // Handle HTML generation messages
+  if (data.type === 'danae:html') {
+    messageCounter++;
+    msgCount.textContent = 'Messages: ' + messageCounter;
+
+    let html = data.html || data.code || '';
+
+    // Clean up markdown code blocks if present
+    html = html.replace(/^```html?\n?/i, '').replace(/```$/i, '').trim();
+
+    // Try to extract HTML if wrapped
+    if (!html.startsWith('<')) {
+      const match = html.match(/<(!DOCTYPE|html|div|body)[\s\S]*<\/(html|div|body)>/i);
+      if (match) html = match[0];
+    }
+
+    if (html) {
+      currentHTML = html;
+
+      // Display code
+      codePanel.textContent = html;
+
+      // Display preview
+      previewFrame.srcdoc = html;
+      previewFrame.style.display = 'block';
+      placeholder.style.display = 'none';
+
+      console.log('✓ Artifact loaded:', html.length, 'chars');
+    }
+  }
+});
+
+// Copy code
+copyBtn.addEventListener('click', () => {
+  if (currentHTML) {
+    navigator.clipboard.writeText(currentHTML).then(() => {
+      copyBtn.textContent = '✓ COPIED';
+      setTimeout(() => { copyBtn.textContent = 'COPY CODE'; }, 2000);
+    });
+  }
+});
+
+// Download HTML
+downloadBtn.addEventListener('click', () => {
+  if (!currentHTML) return;
+  const a = document.createElement('a');
+  a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(currentHTML);
+  a.download = 'danae-artifact-' + Date.now() + '.html';
+  a.click();
+  downloadBtn.textContent = '✓ DOWNLOADED';
+  setTimeout(() => { downloadBtn.textContent = 'DOWNLOAD'; }, 2000);
+});
+
+// Refresh preview
+refreshBtn.addEventListener('click', () => {
+  if (currentHTML) {
+    previewFrame.srcdoc = currentHTML;
+  }
+});
+
+// Signal to parent that we're ready
+window.parent.postMessage({ type: 'danae:studio-ready' }, '*');
+
+console.log('DANAE Studio bridge loaded. Ready to receive HTML from chat.');
+})();
+</script>
+</body>
+</html>
