@@ -2,12 +2,14 @@ import os
 from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class Config(BaseModel):
     """Unified Platform configuration"""
 
-    pookie_key: str = Field(..., description="Sovereign key from pookie keygen")
+    model_config = ConfigDict(env_file=".env")
+
+    pookie_key: str = Field(default="", description="Sovereign key from pookie keygen")
     pookie_registry: str = Field(
         default="http://108.181.162.206:7070",
         description="pookie registry URL"
@@ -24,9 +26,6 @@ class Config(BaseModel):
     bash_timeout_seconds: int = Field(default=30)
     file_read_timeout_seconds: int = Field(default=30)
 
-    class Config:
-        env_file = ".env"
-
     @classmethod
     def from_env(cls, env_file: Optional[str] = None) -> "Config":
         """Load config from environment and optional .env file"""
@@ -36,7 +35,7 @@ class Config(BaseModel):
             load_dotenv(".env")
 
         # Validate required fields
-        pookie_key = os.getenv("POOKIE_KEY")
+        pookie_key = os.getenv("POOKIE_KEY", "")
         if not pookie_key:
             raise ValueError(
                 "POOKIE_KEY not set. Run 'pookie keygen' and set POOKIE_KEY environment variable."
