@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  unified-platform:
+    build: .
+    container_name: unified-platform
+    environment:
+      - POOKIE_KEY=${POOKIE_KEY}
+      - POOKIE_REGISTRY=http://108.181.162.206:7070
+      - POOKIE_VPS_HOST=108.181.162.206
+      - MCP_SERVER_HOST=0.0.0.0
+      - MCP_SERVER_PORT=8000
+      - MEMORY_DB_PATH=/app/data/memory.db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    stdin_open: true
+    tty: true
