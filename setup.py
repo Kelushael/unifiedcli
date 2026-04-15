@@ -14,6 +14,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
+            "unifiedcli=unified.cli:main",
             "unified-cli=unified.cli:main",
         ],
     },
